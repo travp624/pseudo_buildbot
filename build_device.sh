@@ -4,6 +4,79 @@
 # $2 should be device name
 # select device and prepare varibles
 BUILD_ROOT=`pwd`
+
+# OTAUPDATECENTER
+USERID=userid
+ROMID=romid
+NOW=$(date +"%Y%m%d-%H%M)
+CHANGELOG=$(cat $BUILD_ROOT/changelog.xml)
+if [[ "$2" == "tf201" ]]
+        then
+        ROMID=816
+elif [[ "$2" == "toro" ]]
+        then
+        ROMID=797
+elif [[ "$2" == "maguro" ]]
+        then
+        ROMID=798
+elif [[ "$2" == "SCH-I500" ]]
+        then
+        ROMID=829
+elif [[ "$2" == "SGH-I897" ]]
+        then
+        ROMID=801
+elif [[ "$2" == "crespo4g" ]]
+        then
+        ROMID=803
+elif [[ "$2" == "grouper" ]]
+        then
+        ROMID=804
+elif [[ "$2" == "d2tmo" ]]
+        then
+        ROMID=805
+elif [[ "$2" == "GT-I9000" ]]
+        then
+        ROMID=813
+elif [[ "$2" == "endeavoru" ]]
+        then
+        ROMID=812
+elif [[ "$2" == "d2vzw" ]]
+        then
+        ROMID=811
+elif [[ "$2" == "toroplus" ]]
+        then
+        ROMID=810
+elif [[ "$2" == "espressowifi" ]]
+        then
+        ROMID=814
+elif [[ "$2" == "stingray" ]]
+        then
+        ROMID=818
+elif [[ "$2" == "tf300t" ]]
+        then
+        ROMID=819
+elif [[ "$2" == "SGH-T959" ]]
+        then
+        ROMID=820
+elif [[ "$2" == "d2spr" ]]
+        then
+        ROMID=847
+elif [[ "$2" == "crespo" ]]
+        then
+        ROMID=850
+else
+echo "$2 unsupported, you need to add it to the script."
+exit
+fi
+
+
+
+
+
+
+
+
+
 cd $BUILD_ROOT
 . build/envsetup.sh
 lunch $1
@@ -47,6 +120,8 @@ echo "$2 build complete"
 # md5sum list
 cd $OUTD
 md5sum $ZIP | cat >> md5sum
+MD5=$(cat md5sum)
+
 
 # upload
 echo "checking on upload reference file"
@@ -59,6 +134,8 @@ if test -x upload ; then
     cd $OUTD
     # device and zip names are passed on for upload
     ./upload $2 $ZIP && rm upload
+    # Update rom on OTAUpdateCenter
+    ./update_rominfo.sh -u $USERID -r $ROMID -d $2 -m $MD5 -l http://bakedrom.backupuser.com/$2/$ZIP -v $3 -t $NOW -c "$CHANGELOG"
 else
     echo "No upload file found (or set to +x), build complete."
 fi
